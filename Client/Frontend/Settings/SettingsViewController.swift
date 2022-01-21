@@ -60,6 +60,7 @@ class SettingsViewController: TableViewController {
     private let legacyWallet: BraveLedger?
     private let feedDataSource: FeedDataSource
     private let historyAPI: BraveHistoryAPI
+    private let passwordAPI: BravePasswordAPI
     private let syncAPI: BraveSyncAPI
     private let walletSettingsStore: SettingsStore?
     private let windowProtection: WindowProtection?
@@ -73,19 +74,18 @@ class SettingsViewController: TableViewController {
          rewards: BraveRewards? = nil,
          legacyWallet: BraveLedger? = nil,
          windowProtection: WindowProtection?,
-         historyAPI: BraveHistoryAPI,
-         syncAPI: BraveSyncAPI,
-         walletSettingsStore: SettingsStore? = nil
-    ) {
+         braveCore: BraveCoreMain,
+         walletKeyringStore: KeyringStore? = nil) {
         self.profile = profile
         self.tabManager = tabManager
         self.feedDataSource = feedDataSource
         self.rewards = rewards
         self.legacyWallet = legacyWallet
         self.windowProtection = windowProtection
-        self.historyAPI = historyAPI
-        self.syncAPI = syncAPI
-        self.walletSettingsStore = walletSettingsStore
+        self.historyAPI = braveCore.historyAPI
+        self.passwordAPI = braveCore.passwordAPI
+        self.syncAPI = braveCore.syncAPI
+        self.walletKeyringStore = walletKeyringStore
         
         super.init(style: .insetGrouped)
     }
@@ -443,8 +443,9 @@ class SettingsViewController: TableViewController {
             rows: [
                 .boolRow(title: Strings.browserLock, detailText: Strings.browserLockDescription, option: Preferences.Privacy.lockWithPasscode, image: #imageLiteral(resourceName: "settings-passcode").template),
                 Row(text: Strings.Login.loginListNavigationTitle, selection: { [unowned self] in
-                    let loginsPasswordsViewController = LoginListViewController(
+                    let loginsPasswordsViewController = LoginListViewControllerCore(
                         profile: self.profile,
+                        passwordAPI: self.passwordAPI,
                         windowProtection: self.windowProtection)
                     loginsPasswordsViewController.settingsDelegate = self.settingsDelegate
                     self.navigationController?.pushViewController(loginsPasswordsViewController, animated: true)

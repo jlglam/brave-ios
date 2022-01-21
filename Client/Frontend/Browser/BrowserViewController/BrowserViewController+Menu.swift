@@ -117,7 +117,7 @@ extension BrowserViewController {
             }
 
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
-                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: historyAPI)
+                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: braveCore.historyAPI)
                 vc.toolbarUrlActionsDelegate = self
                 menuController.pushInnerMenu(vc)
             }
@@ -154,9 +154,8 @@ extension BrowserViewController {
                                                 rewards: self.rewards,
                                                 legacyWallet: self.legacyWallet,
                                                 windowProtection: self.windowProtection,
-                                                historyAPI: self.historyAPI,
-                                                syncAPI: self.syncAPI,
-                                                walletSettingsStore: settingsStore)
+                                                braveCore: self.braveCore,
+                                                walletKeyringStore: keyringStore)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
             }
