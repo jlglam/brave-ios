@@ -490,6 +490,7 @@ extension CertificateView {
     }
 }
 
+#if DEBUG
 struct CertificateView_Previews: PreviewProvider {
     static var previews: some View {
         let model = BraveCertificate(name: "leaf")!
@@ -498,6 +499,7 @@ struct CertificateView_Previews: PreviewProvider {
             .environmentObject(model)
     }
 }
+#endif
 
 class CertificateViewController: UIViewController, PopoverContentComponent {
     
