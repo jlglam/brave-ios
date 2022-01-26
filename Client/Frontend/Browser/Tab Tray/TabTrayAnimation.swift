@@ -53,7 +53,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
         tabSnapshot.layer.cornerCurve = .continuous
         tabSnapshot.clipsToBounds = true
         tabSnapshot.contentMode = .scaleAspectFill
-        tabSnapshot.frame = bvc.webViewContainer.frame
+        tabSnapshot.frame = bvc.webViewController.view.frame
         
         // Allow the UI to render to make the snapshotting code more performant
         DispatchQueue.main.async { [self] in
@@ -247,7 +247,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
                 cv.transform = .init(scaleX: 1.2, y: 1.2)
                 cv.alpha = 0.5
                 
-                tabSnapshot.frame = bvc.webViewContainer.frame
+                tabSnapshot.frame = bvc.webViewController.view.frame
                 tabSnapshot.layer.cornerRadius = 0
                 toVCSnapshot.frame = finalFrame
                 toVCSnapshot.layer.cornerRadius = 0

@@ -257,7 +257,7 @@ class PlaylistToast: Toast {
             }
             
             $0.centerX.equalTo(viewController.view.snp.centerX)
-            $0.bottom.equalTo(viewController.webViewContainer.safeArea.bottom)
+            $0.bottom.equalTo(viewController.webViewController.view.safeArea.bottom)
             $0.leading.equalTo(viewController.view.safeArea.leading).priority(.high)
             $0.trailing.equalTo(viewController.view.safeArea.trailing).priority(.high)
             $0.width.lessThanOrEqualTo(DesignUX.maxToastWidth)

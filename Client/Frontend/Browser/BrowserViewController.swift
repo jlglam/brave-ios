@@ -49,7 +49,7 @@ protocol BrowserViewControllerDelegate: AnyObject {
 }
 
 class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
-    var webViewContainer: UIView!
+    var webViewController: WebViewController!
     var topToolbar: TopToolbarView!
     var tabsBar: TabsBarViewController!
     var clipboardBarDisplayHandler: ClipboardBarDisplayHandler?
@@ -599,7 +599,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         // when the app is in the home switcher
         if let tab = tabManager.selectedTab, tab.isPrivate {
             webViewContainerBackdrop.alpha = 1
-            webViewContainer.alpha = 0
+            webViewController.view.alpha = 0
             topToolbar.locationContainer.alpha = 0
             presentedViewController?.popoverPresentationController?.containerView?.alpha = 0
             presentedViewController?.view.alpha = 0
@@ -615,7 +615,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         // Re-show any components that might have been hidden because they were being displayed
         // as part of a private mode tab
         UIView.animate(withDuration: 0.2, delay: 0, options: UIView.AnimationOptions(), animations: {
-            self.webViewContainer.alpha = 1
+            self.webViewController.view.alpha = 1
             self.topToolbar.locationContainer.alpha = 1
             self.presentedViewController?.popoverPresentationController?.containerView?.alpha = 1
             self.presentedViewController?.view.alpha = 1
@@ -656,8 +656,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         webViewContainerBackdrop.alpha = 0
         view.addSubview(webViewContainerBackdrop)
 
-        webViewContainer = UIView()
-        view.addSubview(webViewContainer)
+        webViewController = WebViewController()
+        addChild(webViewController)
+        webViewController.didMove(toParent: self)
+        view.addSubview(webViewController.view)
 
         // Temporary work around for covering the non-clipped web view content
         statusBarOverlay = UIView()
@@ -838,7 +840,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         }
 
         webViewContainerBackdrop.snp.makeConstraints { make in
-            make.edges.equalTo(webViewContainer)
+            make.edges.equalTo(webViewController.view)
         }
         
         topTouchArea.snp.makeConstraints { make in
@@ -975,7 +977,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     let pageOverlayLayoutGuide = UILayoutGuide()
 
     override func updateViewConstraints() {
-        webViewContainer.snp.remakeConstraints { make in
+        webViewController.view.snp.remakeConstraints { make in
             make.left.right.equalTo(self.view)
             
             webViewContainerTopOffset = make.top.equalTo(readerModeBar?.snp.bottom ?? self.header.snp.bottom).constraint
@@ -1069,7 +1071,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                 ntpController.view.alpha = 1
             }, completion: { finished in
                 if finished {
-                    self.webViewContainer.accessibilityElementsHidden = true
+                    self.webViewController.accessibilityElementsHidden = true
                     UIAccessibility.post(notification: .screenChanged, argument: nil)
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -1095,7 +1097,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             controller.willMove(toParent: nil)
             controller.view.removeFromSuperview()
             controller.removeFromParent()
-            self.webViewContainer.accessibilityElementsHidden = false
+            self.webViewController.accessibilityElementsHidden = false
             UIAccessibility.post(notification: .screenChanged, argument: nil)
             
             // Refresh the reading view toolbar since the article record may have changed
@@ -1941,7 +1943,7 @@ extension BrowserViewController: TabsBarViewControllerDelegate {
 extension BrowserViewController: TabDelegate {
 
     func tab(_ tab: Tab, didCreateWebView webView: WKWebView) {
-        webView.frame = webViewContainer.frame
+        webView.frame = webViewController.view.frame
         // Observers that live as long as the tab. Make sure these are all cleared in willDeleteWebView below!
         KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
         webView.scrollView.addObserver(self.scrollController, forKeyPath: KVOConstants.contentSize.rawValue, options: .new, context: nil)
@@ -2180,10 +2182,7 @@ extension BrowserViewController: TabManagerDelegate {
             ReaderModeHandlers.readerModeCache = readerModeCache
 
             scrollController.tab = selected
-            webViewContainer.addSubview(webView)
-            webView.snp.remakeConstraints { make in
-                make.left.right.top.bottom.equalTo(self.webViewContainer)
-            }
+            webViewController.webView = webView
             
             // This is a terrible workaround for a bad iOS 12 bug where PDF
             // content disappears any time the view controller changes (i.e.
@@ -2307,7 +2306,7 @@ extension BrowserViewController: TabManagerDelegate {
 
         toast.showToast(viewController: self, delay: delay, duration: duration, makeConstraints: { make in
             make.left.right.equalTo(self.view)
-            make.bottom.equalTo(self.webViewContainer)
+            make.bottom.equalTo(self.webViewController.view)
         })
     }
     

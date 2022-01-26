@@ -10,6 +10,7 @@ import BraveCore
 import Storage
 import Data
 import SwiftUI
+import BraveWallet
 
 // MARK: - TopToolbarDelegate
 
@@ -29,6 +30,36 @@ extension BrowserViewController: TopToolbarDelegate {
         }
         
         isTabTrayActive = true
+        
+        let ogBg = toolbar?.backgroundColor
+        webViewController.definesPresentationContext = true
+//        let view = ConnectPanelView(keyringStore: .init(keyringService: BraveWallet.KeyringServiceFactory.get(privateMode: false)!))
+        let view = ConnectedSitePanelView(
+            keyringStore: .init(keyringService: BraveWallet.KeyringServiceFactory.get(privateMode: false)!),
+            networkStore: .init(rpcService: BraveWallet.JsonRpcServiceFactory.get(privateMode: false)!)
+        )
+        let controller = WalletPanelHostingController(rootView: view)
+        controller.tappedBackground = {
+            self.webViewController?.dismiss(animated: true)
+            if let toolbar = self.toolbar {
+                UIView.transition(with: toolbar, duration: 0.2, options: [.transitionCrossDissolve], animations: {
+                    self.toolbar?.backgroundColor = ogBg
+                    self.toolbar?.actionButtons.forEach {
+                        $0.tintColor = .braveLabel
+                    }
+                }, completion: nil)
+            }
+        }
+        webViewController.present(controller, animated: true)
+        if let toolbar = self.toolbar {
+            UIView.transition(with: toolbar, duration: 0.2, options: [.transitionCrossDissolve], animations: {
+                self.toolbar?.backgroundColor = .braveBlurple
+                self.toolbar?.actionButtons.forEach {
+                    $0.tintColor = .white
+                }
+            }, completion: nil)
+        }
+        return
         
         let tabTrayController = TabTrayController(tabManager: tabManager).then {
             $0.delegate = self
@@ -399,7 +430,7 @@ extension BrowserViewController: TopToolbarDelegate {
             favoritesController.view.alpha = 1
         }
         animator.addCompletion { _ in
-            self.webViewContainer.accessibilityElementsHidden = true
+            self.webViewController.accessibilityElementsHidden = true
             UIAccessibility.post(notification: .screenChanged, argument: nil)
         }
         animator.startAnimation()
@@ -414,7 +445,7 @@ extension BrowserViewController: TopToolbarDelegate {
             controller.willMove(toParent: nil)
             controller.view.removeFromSuperview()
             controller.removeFromParent()
-            self.webViewContainer.accessibilityElementsHidden = false
+            self.webViewController.accessibilityElementsHidden = false
             UIAccessibility.post(notification: .screenChanged, argument: nil)
         })
     }

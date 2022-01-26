@@ -211,7 +211,7 @@ extension BrowserViewController {
                 self.view.endEditing(true)
                 
                 let toast = SimpleToast()
-                toast.showAlertWithText(Strings.CustomSearchEngine.thirdPartySearchEngineAddedToastTitle, bottomContainer: self.webViewContainer)
+                toast.showAlertWithText(Strings.CustomSearchEngine.thirdPartySearchEngineAddedToastTitle, bottomContainer: self.webViewController.view)
                 
                 self.customSearchEngineButton.action = .disabled
             } catch {
