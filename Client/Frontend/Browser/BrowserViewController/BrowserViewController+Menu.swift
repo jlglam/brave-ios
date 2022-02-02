@@ -155,7 +155,7 @@ extension BrowserViewController {
                                                 legacyWallet: self.legacyWallet,
                                                 windowProtection: self.windowProtection,
                                                 braveCore: self.braveCore,
-                                                walletKeyringStore: keyringStore)
+                                                walletSettingsStore: settingsStore)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
             }

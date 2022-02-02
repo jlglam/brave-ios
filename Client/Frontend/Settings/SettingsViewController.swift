@@ -75,7 +75,7 @@ class SettingsViewController: TableViewController {
          legacyWallet: BraveLedger? = nil,
          windowProtection: WindowProtection?,
          braveCore: BraveCoreMain,
-         walletKeyringStore: KeyringStore? = nil) {
+         walletSettingsStore: SettingsStore? = nil) {
         self.profile = profile
         self.tabManager = tabManager
         self.feedDataSource = feedDataSource
@@ -85,7 +85,7 @@ class SettingsViewController: TableViewController {
         self.historyAPI = braveCore.historyAPI
         self.passwordAPI = braveCore.passwordAPI
         self.syncAPI = braveCore.syncAPI
-        self.walletKeyringStore = walletKeyringStore
+        self.walletSettingsStore = walletSettingsStore
         
         super.init(style: .insetGrouped)
     }
